@@ -50,7 +50,7 @@ Gui.create_edit_frame = function(index, edit_table)
     local edit_title_ = Gui.create_simple_gui_element({
             type = "label",
             name = "blank-pickup-gui-edit-label",
-            caption = "Edit Slot "..index
+            caption = {"mod-text.gui-edit-slot-label", index}
         },edit_flow)
     local edit_top_table = Gui.create_simple_gui_element({
             type = "table",
@@ -78,7 +78,7 @@ Gui.create_edit_frame = function(index, edit_table)
     local edit_ok_button_ = Gui.create_simple_gui_element({
             type = "button",
             name = "blank-pickup-gui-edit-ok-button",
-            caption = "OK"
+            caption = {"mod-text.gui-ok"}
         },edit_top_table)
 
     local edit_minus_1000_button = Gui.create_simple_gui_element({
@@ -202,7 +202,7 @@ Gui.create_main_menu = function(player)
     local frame_label_ = Gui.create_simple_gui_element({
             type = "label",
             name = "blank-pickup-gui-frame-label",
-            caption = "Pickup Hotkey Menu"
+            caption = {"mod-text.gui-main-menu-label"}
         },
         vert_flow_)
 

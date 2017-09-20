@@ -21,6 +21,7 @@ local function init_filter(player)
     global.pickup_player_filter[player.index] = Filter.generate_filter_from_gui(player)
 end
 
+--Initializes the blacklist for player
 local function init_blacklist(player)
     global.pickup_player_blacklist = global.pickup_player_blacklist or {}
     global.pickup_player_blacklist[player.index] = global.pickup_player_blacklist[player.index] or {}
@@ -233,9 +234,10 @@ script.on_event(defines.events.on_gui_click, function(event)
         end
     end
 
+    --Handles Mouse Clicks for the edit frame buttons
     for cname,child in pairs(gui.edit_table.children) do
             if elem.type == "button" then
-                if elem.caption == "OK" and elem.name == "blank-pickup-gui-edit-ok-button" and elem.parent.parent.parent.name == cname then
+                if elem.name == "blank-pickup-gui-edit-ok-button" and elem.parent.parent.parent.name == cname then
                     local selected_item = child.item_selector.live_elem.elem_value
                     local selected_textfield = child.item_textfield.live_elem
 
