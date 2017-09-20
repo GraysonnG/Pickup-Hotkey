@@ -196,7 +196,7 @@ script.on_event("blank-pickup-menu", function(event)
 end)
 
 --Event handler for blacklisting items
-script.on_event("blank-pickup-blacklist", function(event)
+--[[script.on_event("blank-pickup-blacklist", function(event)
     local player = game.players[event.player_index]
     local selected_entity = player.selected
 
@@ -206,6 +206,8 @@ script.on_event("blank-pickup-blacklist", function(event)
         player.print(selected_entity.unit_number)
     end
 end)
+]]
+
 --Event handler for all on_click events
 script.on_event(defines.events.on_gui_click, function(event)
     local elem = event.element
@@ -214,6 +216,10 @@ script.on_event(defines.events.on_gui_click, function(event)
     init_gui(player_)
 
     local gui = global.pickup_player_fancy_gui[event.player_index]
+
+    if event.button == defines.mouse_button_type.left and elem.name == "blank-pickup-gui-close-button" then
+        gui.live_elem.style.visible = false
+    end
 
     --Handles Mouse Clicks for the filter buttons
     for i=1, blank_pickup_hotkey_defines.gui.filter_count, 1 do
@@ -236,7 +242,7 @@ script.on_event(defines.events.on_gui_click, function(event)
 
     --Handles Mouse Clicks for the edit frame buttons
     for cname,child in pairs(gui.edit_table.children) do
-            if elem.type == "button" then
+            if elem.type == "button" and event.button == defines.mouse_button_type.left then
                 if elem.name == "blank-pickup-gui-edit-ok-button" and elem.parent.parent.parent.name == cname then
                     local selected_item = child.item_selector.live_elem.elem_value
                     local selected_textfield = child.item_textfield.live_elem
@@ -284,9 +290,13 @@ script.on_event(defines.events.on_gui_elem_changed, function(event)
 
                     edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-minus-stack-button"].live_elem.caption = "-"..stack_size
                     edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-plus-stack-button"].live_elem.caption = "+"..stack_size
+                    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-minus-1k-button"].live_elem.caption = "-"..10 * stack_size
+                    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-plus-1k-button"].live_elem.caption = "+"..10 * stack_size
 
                     edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-minus-stack-button"].value = -1 * stack_size
                     edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-plus-stack-button"].value = stack_size
+                    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-minus-1k-button"].value = -10 * stack_size
+                    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-plus-1k-button"].value = 10 * stack_size
 
                     edit_frame.item_selector.live_elem.elem_value = child.parent.item_selector.live_elem.elem_value
                     edit_frame.live_elem.style.visible = true

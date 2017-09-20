@@ -213,10 +213,17 @@ Gui.create_main_menu = function(player)
         },
         vert_flow_)
 
+    local filter_close_ = Gui.create_simple_gui_element({
+            type = "button",
+            name = "blank-pickup-gui-close-button",
+            caption = {"mod-text.gui-close"}
+        },vert_flow_)
+
     for i = 1, blank_pickup_hotkey_defines.gui.filter_count, 1 do
         local filter_item_ = Gui.create_filter_item(i, filter_table_, edit_gui_table)
         filter_item_.item_button.style = blank_pickup_hotkey_defines.gui.default_styles.default_button
     end
+    filter_close_.style = blank_pickup_hotkey_defines.gui.default_styles.default_small_button
 
     gui.filter_table = filter_table_
     gui.edit_table = edit_gui_table
