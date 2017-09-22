@@ -1,11 +1,11 @@
 --luacheck: ignore 211/.*_
-local blank_pickup_hotkey_defines = require("defines")
+local pickup_defines = require("defines")
 local mod_gui = require("mod-gui")
-local Util_ = require("util.util")
+local Util_ = require("scripts.util")
 
 local Gui = {}
 
-Gui.gen_children_in_parent = function(disp_parent, gui)
+function Gui.gen_children_in_parent(disp_parent, gui)
 
     local disp = disp_parent.add(gui.element_value)
 
@@ -16,10 +16,9 @@ Gui.gen_children_in_parent = function(disp_parent, gui)
     end
 
     gui.live_elem = disp
-
 end
 
-Gui.gen_gui = function(gui, player)
+function Gui.gen_gui(gui, player)
     local frame_flow = mod_gui.get_frame_flow(player)
     Gui.gen_children_in_parent(frame_flow, gui)
     local edit_gui = frame_flow.add(gui.edit_table.element_value)
@@ -30,13 +29,13 @@ Gui.gen_gui = function(gui, player)
     gui.live_elem.style.visible = false
 end
 
-Gui.create_simple_gui_element = function(e, p)
+function Gui.create_simple_gui_element(e, p)
     local new_element = {element_value = e, parent = p, children = {}, sibling = {}, style = nil, on_event = nil}
     if p ~= nil then p.children[e.name] = new_element end
     return new_element
 end
 
-Gui.create_edit_frame = function(index, edit_table)
+function Gui.create_edit_frame(index, edit_table)
     local edit_frame_ = Gui.create_simple_gui_element({
             type = "frame",
             name = "blank-pickup-gui-edit-frame-"..index
@@ -105,23 +104,13 @@ Gui.create_edit_frame = function(index, edit_table)
             caption = "+1000"
         },edit_bot_table)
 
-    edit_item_selector_.style = function(live_elem)
-        live_elem.style.minimal_height = blank_pickup_hotkey_defines.gui.small_button_height
-        live_elem.style.maximal_height = blank_pickup_hotkey_defines.gui.small_button_height
-        live_elem.style.minimal_width = blank_pickup_hotkey_defines.gui.small_button_height
-        live_elem.style.maximal_width = blank_pickup_hotkey_defines.gui.small_button_height
-    end
-
-    edit_item_textbox_.style = function(live_elem)
-        live_elem.style.minimal_height = blank_pickup_hotkey_defines.gui.small_button_height
-        live_elem.style.maximal_height = blank_pickup_hotkey_defines.gui.small_button_height
-    end
-
-    edit_ok_button_.style = blank_pickup_hotkey_defines.gui.default_styles.default_ok_button
-    edit_minus_1000_button.style = blank_pickup_hotkey_defines.gui.default_styles.default_small_button
-    edit_minus_stack_button.style = blank_pickup_hotkey_defines.gui.default_styles.default_small_button
-    edit_plus_stack_button.style = blank_pickup_hotkey_defines.gui.default_styles.default_small_button
-    edit_plus_1000_button.style = blank_pickup_hotkey_defines.gui.default_styles.default_small_button
+    edit_item_selector_.style = pickup_defines.gui.default_styles.default_small_select_elem_button
+    edit_item_textbox_.style = pickup_defines.gui.default_styles.default_textfield
+    edit_ok_button_.style = pickup_defines.gui.default_styles.default_ok_button
+    edit_minus_1000_button.style = pickup_defines.gui.default_styles.default_small_button
+    edit_minus_stack_button.style = pickup_defines.gui.default_styles.default_small_button
+    edit_plus_stack_button.style = pickup_defines.gui.default_styles.default_small_button
+    edit_plus_1000_button.style = pickup_defines.gui.default_styles.default_small_button
 
     edit_minus_1000_button.value = -1000
     edit_minus_stack_button.value = -100
@@ -143,7 +132,7 @@ Gui.create_edit_frame = function(index, edit_table)
     return edit_frame_
 end
 
-Gui.create_filter_item = function(index, p, edit_table)
+function Gui.create_filter_item(index, p, edit_table)
     local selector_table = Gui.create_simple_gui_element({
             type = "table",
             name = "blank-pickup-gui-filter-selector-table-"..index,
@@ -179,7 +168,7 @@ Gui.create_filter_item = function(index, p, edit_table)
     return selector_table
 end
 
-Gui.create_main_menu = function(player)
+function Gui.create_main_menu(player)
     local gui = Gui.create_simple_gui_element({
             type = "frame",
             name = "blank-pickup-gui-frame"
@@ -219,11 +208,11 @@ Gui.create_main_menu = function(player)
             caption = {"mod-text.gui-close"}
         },vert_flow_)
 
-    for i = 1, blank_pickup_hotkey_defines.gui.filter_count, 1 do
+    for i = 1, pickup_defines.gui.filter_count, 1 do
         local filter_item_ = Gui.create_filter_item(i, filter_table_, edit_gui_table)
-        filter_item_.item_button.style = blank_pickup_hotkey_defines.gui.default_styles.default_button
+        filter_item_.item_button.style = pickup_defines.gui.default_styles.default_button
     end
-    filter_close_.style = blank_pickup_hotkey_defines.gui.default_styles.default_small_button
+    filter_close_.style = pickup_defines.gui.default_styles.default_small_button
 
     gui.filter_table = filter_table_
     gui.edit_table = edit_gui_table
@@ -231,6 +220,33 @@ Gui.create_main_menu = function(player)
     Gui.gen_gui(gui, player)
 
     return gui
+end
+
+function Gui.set_edit_frame(edit_frame, item_name)
+    local stack_size = 100
+
+    if item_name ~= nil then
+        stack_size = game.item_prototypes[item_name].stack_size
+    end
+
+    edit_frame.item_textfield.value = stack_size
+
+    if stack_size == 0 then stack_size = 100 end
+
+    edit_frame.item_textfield.live_elem.text = item_name ~= nil and stack_size or 0
+    edit_frame.item_textfield.value = stack_size or 0
+
+    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-minus-stack-button"].live_elem.caption = "-"..stack_size
+    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-plus-stack-button"].live_elem.caption = "+"..stack_size
+    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-minus-1k-button"].live_elem.caption = "-"..10 * stack_size
+    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-plus-1k-button"].live_elem.caption = "+"..10 * stack_size
+
+    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-minus-stack-button"].value = -1 * stack_size
+    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-plus-stack-button"].value = stack_size
+    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-minus-1k-button"].value = -10 * stack_size
+    edit_frame.item_textfield.button_controls["blank-pickup-gui-edit-plus-1k-button"].value = 10 * stack_size
+
+    edit_frame.item_selector.live_elem.elem_value = item_name
 end
 
 return Gui

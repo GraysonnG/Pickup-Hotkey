@@ -30,4 +30,21 @@ blank_pickup_hotkey_defines.gui.default_styles.default_small_button = function(l
     live_elem.style.top_padding = 1
 end
 
+blank_pickup_hotkey_defines.gui.default_styles.default_textfield = function(live_elem)
+    live_elem.style.minimal_height = blank_pickup_hotkey_defines.gui.small_button_height
+    live_elem.style.maximal_height = blank_pickup_hotkey_defines.gui.small_button_height
+end
+
+blank_pickup_hotkey_defines.gui.default_styles.default_small_select_elem_button = function(live_elem)
+    live_elem.style.minimal_height = blank_pickup_hotkey_defines.gui.small_button_height
+    live_elem.style.maximal_height = blank_pickup_hotkey_defines.gui.small_button_height
+    live_elem.style.minimal_width = blank_pickup_hotkey_defines.gui.small_button_height
+    live_elem.style.maximal_width = blank_pickup_hotkey_defines.gui.small_button_height
+end
+
+blank_pickup_hotkey_defines.gui.names = {}
+
+blank_pickup_hotkey_defines.gui.names.gui_main = "blank-pickup-gui"
+blank_pickup_hotkey_defines.gui.names.gui_edit = "blank-pickup-gui-edit"
+
 return blank_pickup_hotkey_defines
