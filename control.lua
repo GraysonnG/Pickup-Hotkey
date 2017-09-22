@@ -22,9 +22,35 @@ local function init_filter(player)
 end
 
 --Initializes the blacklist for player
-local function init_blacklist(player)
+local function init_blacklist()
     global.pickup_player_blacklist = global.pickup_player_blacklist or {}
-    global.pickup_player_blacklist[player.index] = global.pickup_player_blacklist[player.index] or {}
+end
+
+local function add_ent_to_blacklist(selected_entity)
+    local unit_number = selected_entity.unit_number
+
+    local pos = selected_entity.position
+    pos.y = pos.y + 1 + (selected_entity.prototype.selection_box.left_top.y)
+
+    local blacklist_icon = selected_entity.surface.create_entity{
+        name = "blacklist-icon",
+        position = {pos.x, pos.y}
+    }
+    global.pickup_player_blacklist[unit_number] = blacklist_icon
+end
+
+local function remove_ent_to_blacklist(selected_entity)
+    local unit_number = selected_entity.unit_number
+    local pos = selected_entity.position
+    pos.y = pos.y + 1 + (selected_entity.prototype.selection_box.left_top.y)
+
+    global.pickup_player_blacklist[unit_number].destroy()
+    global.pickup_player_blacklist[unit_number] = nil
+
+    selected_entity.surface.create_entity{
+        name = "fading-blacklist-icon",
+        position = {pos.x, pos.y}
+    }
 end
 
 --Returns a list of item counts and inventory pointers for each item in the filter
@@ -134,21 +160,27 @@ local function get_nearby_inventories(surface, pickup_area)
 
     for i=1, #entities, 1 do
         local ent = entities[i]
-        --Filters the entities to those that have output inventories
-        if ent.get_output_inventory() ~= nil then
-            if ent.type == "assembling-machine" or ent.type == "furnace" then
-                table.insert(inventories, ent.get_output_inventory())
-                --insert_items_from_inv(player, ent, ent.get_output_inventory())
+
+        if global.pickup_player_blacklist[ent.unit_number] == nil then
+            --Filters the entities to those that have output inventories
+            if ent.get_output_inventory() ~= nil then
+                if ent.type == "assembling-machine" or ent.type == "furnace" then
+                    table.insert(inventories, ent.get_output_inventory())
+                end
+                --If pickup from chest is enabled pick up from chests
+                if ent.type == "container" and pickup_chest then
+                    table.insert(inventories, ent.get_output_inventory())
+
+                end
             end
-            --If pickup from chest is enabled pick up from chests
-            if ent.type == "container" and pickup_chest then
-                table.insert(inventories, ent.get_output_inventory())
-                --insert_items_from_inv(player, ent, ent.get_output_inventory())
+
+            if ent.type == "character-corpse" then
+                table.insert(inventories, ent.get_inventory(defines.inventory.item_main))
             end
-        --Makes sure that player corpses are included
-        elseif ent.type == "character-corpse" then
-            table.insert(inventories, ent.get_inventory(defines.inventory.item_main))
-            --insert_items_from_inv(player, ent, ent.get_inventory(defines.inventory.item_main))
+
+            if ent.name == "burner-mining-drill" then
+                table.insert(inventories, ent.get_inventory(defines.inventory.fuel))
+            end
         end
     end
 
@@ -205,6 +237,7 @@ script.on_event("blank-pickup-hotkey", function(event)
     --Reinitialize gui and filter and initialize pickup_items
     init_gui(player)
     init_filter(player)
+    init_blacklist()
     main_pickup(player)
 end)
 
@@ -220,17 +253,22 @@ script.on_event("blank-pickup-menu", function(event)
 end)
 
 --Event handler for blacklisting items
---[[script.on_event("blank-pickup-blacklist", function(event)
+script.on_event("blank-pickup-blacklist", function(event)
     local player = game.players[event.player_index]
     local selected_entity = player.selected
 
-    init_blacklist(player)
+    init_blacklist()
 
     if selected_entity and selected_entity.unit_number then
-        player.print(selected_entity.unit_number)
+        local unit_number = selected_entity.unit_number
+
+        if global.pickup_player_blacklist[unit_number] then
+            remove_ent_to_blacklist(selected_entity)
+        else
+            add_ent_to_blacklist(selected_entity)
+        end
     end
 end)
-]]
 
 --Event handler for all on_click events
 script.on_event(defines.events.on_gui_click, function(event)
