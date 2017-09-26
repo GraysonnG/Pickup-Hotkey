@@ -12,31 +12,35 @@ end
 
 --Adds and entities unit number to the blacklist and creates an icon at the entities position
 function util.add_ent_to_blacklist(selected_entity)
-    local unit_number = selected_entity.unit_number
+    if selected_entity.unit_number then
+        local unit_number = selected_entity.unit_number
 
-    local pos = selected_entity.position
-    pos.y = pos.y + 1 + (selected_entity.prototype.selection_box.left_top.y)
+        local pos = selected_entity.position
+        pos.y = pos.y + 1 + (selected_entity.prototype.selection_box.left_top.y)
 
-    local blacklist_icon = selected_entity.surface.create_entity{
-        name = "blacklist-icon",
-        position = {pos.x, pos.y}
-    }
-    global.pickup_player_blacklist[unit_number] = blacklist_icon
+        local blacklist_icon = selected_entity.surface.create_entity{
+            name = "blacklist-icon",
+            position = {pos.x, pos.y}
+        }
+        global.pickup_player_blacklist[unit_number] = blacklist_icon
+    end
 end
 
 --Removes and entities unit number from the blacklist removes the icon and places a closing animation icon in its place
 function util.remove_ent_from_blacklist(selected_entity)
-    local unit_number = selected_entity.unit_number
-    local pos = selected_entity.position
-    pos.y = pos.y + 1 + (selected_entity.prototype.selection_box.left_top.y)
+    if selected_entity.unit_number then
+        local unit_number = selected_entity.unit_number
+        local pos = selected_entity.position
+        pos.y = pos.y + 1 + (selected_entity.prototype.selection_box.left_top.y)
 
-    global.pickup_player_blacklist[unit_number].destroy()
-    global.pickup_player_blacklist[unit_number] = nil
+        global.pickup_player_blacklist[unit_number].destroy()
+        global.pickup_player_blacklist[unit_number] = nil
 
-    selected_entity.surface.create_entity{
-        name = "fading-blacklist-icon",
-        position = {pos.x, pos.y}
-    }
+        selected_entity.surface.create_entity{
+            name = "fading-blacklist-icon",
+            position = {pos.x, pos.y}
+        }
+    end
 end
 
 --Creates a floating text entity at the players position

@@ -117,13 +117,44 @@ script.on_event("blank-pickup-blacklist", function(event)
 
     init_blacklist()
 
-    if selected_entity and selected_entity.unit_number then
+    if selected_entity then
         local unit_number = selected_entity.unit_number
 
         if global.pickup_player_blacklist[unit_number] then
             Util.remove_ent_from_blacklist(selected_entity)
         else
             Util.add_ent_to_blacklist(selected_entity)
+        end
+    end
+end)
+
+
+script.on_event(defines.events.on_player_mined_entity, function(event)
+    local entity = event.entity
+
+    if entity.unit_number and global.pickup_player_blacklist[entity.unit_number] then
+        Util.remove_ent_from_blacklist(entity)
+    end
+end)
+
+script.on_event(defines.events.on_robot_mined_entity, function(event)
+    local entity = event.entity
+
+    if entity.unit_number and global.pickup_player_blacklist[entity.unit_number] then
+        Util.remove_ent_from_blacklist(entity)
+    end
+end)
+
+--Event handler for when the player places an entity
+script.on_event(defines.events.on_built_entity, function(event)
+    local entity = event.created_entity
+    local player = game.players[event.player_index]
+    local gui = global.pickup_player_fancy_gui[player.index]
+
+    for i=1,pickup_defines_.gui.filter_count, 1 do
+        local filter_item = gui.blacklist_table.children[pickup_defines_.gui.names.gui_main.."-blacklist-table-"..i].item_selector.live_elem.elem_value
+        if entity.name == filter_item then
+            Util.add_ent_to_blacklist(entity)
         end
     end
 end)
@@ -152,6 +183,9 @@ script.on_event(defines.events.on_gui_click, function(event)
 
     --Handles Mouse Clicks on the edit frame buttons
     Events.on_click_edit_buttons(event, elem, gui)
+
+    --Handles Mouse Clicks on the filter tabs
+    Events.on_click_tab_buttons(elem, gui)
 end)
 
 --Event handler for when a item selector is changed

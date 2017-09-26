@@ -195,12 +195,32 @@ function Gui.create_main_menu(player)
         },
         vert_flow_)
 
+    local frame_tabs_ = Gui.create_simple_gui_element({
+            type = "table",
+            name = pickup_defines.gui.names.gui_main.."-tab-table",
+            colspan = 2
+        }, vert_flow_)
+
+    local filter_item_tab_button = Gui.create_simple_gui_element({
+            type = "button",
+            name = pickup_defines.gui.names.gui_main.."-tab-1",
+            caption = "Filter"
+        },frame_tabs_)
+
+    local filter_enti_tab_button = Gui.create_simple_gui_element({
+            type = "button",
+            name = pickup_defines.gui.names.gui_main.."-tab-2",
+            caption = "Blacklist"
+        },frame_tabs_)
+
     local filter_table_ = Gui.create_simple_gui_element({
             type = "table",
             name = "blank-pickup-gui-filter-table",
             colspan = 2,
         },
         vert_flow_)
+
+    local blacklist = Gui.create_blacklist_table(vert_flow_)
 
     local filter_close_ = Gui.create_simple_gui_element({
             type = "button",
@@ -212,14 +232,53 @@ function Gui.create_main_menu(player)
         local filter_item_ = Gui.create_filter_item(i, filter_table_, edit_gui_table)
         filter_item_.item_button.style = pickup_defines.gui.default_styles.default_button
     end
-    filter_close_.style = pickup_defines.gui.default_styles.default_small_button
 
+    filter_close_.style = pickup_defines.gui.default_styles.default_small_button
+    filter_item_tab_button.style = pickup_defines.gui.default_styles.default_small_button_disabled
+    filter_enti_tab_button.style = pickup_defines.gui.default_styles.default_small_button
+
+    filter_item_tab_button.sibling = filter_enti_tab_button
+    filter_enti_tab_button.sibling = filter_item_tab_button
+
+    gui.blacklist_table = blacklist
     gui.filter_table = filter_table_
     gui.edit_table = edit_gui_table
+    gui.tab_table = frame_tabs_
+    gui.label = frame_label_
 
     Gui.gen_gui(gui, player)
 
     return gui
+end
+
+function Gui.create_blacklist_table(parent)
+    local blacklist_table = Gui.create_simple_gui_element({
+            type = "table",
+            name = pickup_defines.gui.names.gui_main.."-blacklist-table",
+            colspan = 4
+        }, parent)
+
+    for i=1, pickup_defines.gui.filter_count, 1 do
+        local blacklist_item = Gui.create_simple_gui_element({
+                type = "table",
+                name = pickup_defines.gui.names.gui_main.."-blacklist-table-"..i,
+                colspan = 1
+            }, blacklist_table)
+        local blacklist_selector_item = Gui.create_simple_gui_element({
+                type = "choose-elem-button",
+                name = pickup_defines.gui.names.gui_main.."-blacklist-table-selector-"..i,
+                elem_type = "entity"
+            },blacklist_item)
+
+        if i == 1 then blacklist_selector_item.element_value["entity"] = "burner-mining-drill" end
+
+        blacklist_item.item_selector = blacklist_selector_item
+        blacklist_table.style = function(live_elem)
+            live_elem.style.visible = false
+        end
+    end
+
+    return blacklist_table
 end
 
 function Gui.set_edit_frame(edit_frame, item_name)

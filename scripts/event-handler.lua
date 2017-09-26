@@ -100,4 +100,38 @@ function Events.on_click_gui_close(event, elem, gui)
     end
 end
 
+function Events.on_click_tab_buttons(elem, gui)
+    for _,child in pairs(gui.tab_table.children) do
+        if child.live_elem.name == elem.name then
+            --for _,player in pairs(game.players) do player.print(elem.name..":"..child.live_elem.name) end
+            --child.live_elem.style.visible = not child.live_elem.style.visible
+            --child.sibling.live_elem.style.visible = not child.live_elem.style.visible
+
+            Events.on_click_item_tab_button(elem, gui, child)
+            Events.on_click_entity_tab_button(elem, gui, child)
+        end
+    end
+end
+
+function Events.on_click_item_tab_button(elem, gui, button)
+    if elem.name == pickup_defines.gui.names.gui_main.."-tab-1" then
+        gui.blacklist_table.live_elem.style.visible = false
+        gui.filter_table.live_elem.style.visible = true
+        button.live_elem.style.visible = false
+        button.sibling.live_elem.style.visible = true
+        gui.label.live_elem.caption = {"mod-text.gui-main-menu-label"}
+    end
+end
+
+function Events.on_click_entity_tab_button(elem, gui, button)
+    if elem.name == pickup_defines.gui.names.gui_main.."-tab-2" then
+        gui.filter_table.live_elem.style.visible = false
+        gui.blacklist_table.live_elem.style.visible = true
+        button.live_elem.style.visible = false
+        button.sibling.live_elem.style.visible = true
+        gui.label.live_elem.caption = {"mod-text.gui-blacklist-label"}
+        --for _,player in pairs(game.players) do player.print("activate blacklist") end
+    end
+end
+
 return Events

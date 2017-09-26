@@ -30,6 +30,11 @@ blank_pickup_hotkey_defines.gui.default_styles.default_small_button = function(l
     live_elem.style.top_padding = 1
 end
 
+blank_pickup_hotkey_defines.gui.default_styles.default_small_button_disabled = function(live_elem)
+    blank_pickup_hotkey_defines.gui.default_styles.default_small_button(live_elem)
+    live_elem.style.visible = false
+end
+
 blank_pickup_hotkey_defines.gui.default_styles.default_textfield = function(live_elem)
     live_elem.style.minimal_height = blank_pickup_hotkey_defines.gui.small_button_height
     live_elem.style.maximal_height = blank_pickup_hotkey_defines.gui.small_button_height
