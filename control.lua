@@ -132,6 +132,8 @@ end)
 script.on_event(defines.events.on_player_mined_entity, function(event)
     local entity = event.entity
 
+    init_blacklist()
+
     if entity.unit_number and global.pickup_player_blacklist[entity.unit_number] then
         Util.remove_ent_from_blacklist(entity)
     end
@@ -139,6 +141,8 @@ end)
 
 script.on_event(defines.events.on_robot_mined_entity, function(event)
     local entity = event.entity
+
+    init_blacklist()
 
     if entity.unit_number and global.pickup_player_blacklist[entity.unit_number] then
         Util.remove_ent_from_blacklist(entity)
